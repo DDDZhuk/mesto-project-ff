@@ -1,4 +1,4 @@
-import { cardTemplate } from "..";
+import { cardTemplate, likeHandler } from "..";
 import { openImagePopup } from "./modal";
 
 export const initialCards = [
@@ -43,12 +43,9 @@ export function creatingCard (name,link,deleteCard){
   deleteButton.addEventListener('click', deleteCard);
 
 
-  // Находим кнопку лайка и добавляем обработчик события клика
-  const likeButton = cardElement.querySelector('.card__like-button');
-  likeButton.addEventListener('click', function (evt) {
-  // Переключаем класс активности лайка при клике на него
-  evt.target.classList.toggle('card__like-button_is-active');
-});
+ // Находим кнопку лайка и добавляем обработчик события клика
+ const likeButton = cardElement.querySelector('.card__like-button');
+ likeButton.addEventListener('click', likeHandler);
 
  // Обработчик события для открытия попапа с изображением
  cardImage.addEventListener('click', function () {

@@ -10,7 +10,11 @@ const addButton = document.querySelector('.profile__add-button');
 const popupEdit = document.querySelector('.popup_type_edit');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 
-
+// @todo: Функция-обработчик лайка
+export function likeHandler(evt) {
+    // Переключаем класс активности лайка при клике на него
+    evt.target.classList.toggle('card__like-button_is-active');
+}
 
 // @todo: Вывести карточки на страницу
 initialCards.forEach(function(element) {
@@ -62,6 +66,9 @@ export function closeOverlay(evt) {
 const formElement = document.querySelector('.popup__form');
 const nameInput = formElement.querySelector('.popup__input_type_name'); 
 const jobInput = formElement.querySelector('.popup__input_type_description'); 
+ // Выбираем элементы, куда будем вставлять значения полей
+ const nameOutput = document.querySelector('.profile__title');
+ const jobOutput = document.querySelector('.profile__description'); 
 
 // Обработчик «отправки» формы
 function handleFormSubmit(evt) {
@@ -71,9 +78,6 @@ function handleFormSubmit(evt) {
     const nameValue = nameInput.value;
     const jobValue = jobInput.value;
 
-    // Выбираем элементы, куда будем вставлять значения полей
-    const nameOutput = document.querySelector('.profile__title');
-    const jobOutput = document.querySelector('.profile__description'); 
 
     // Вставляем новые значения с помощью textContent
     nameOutput.textContent = nameValue;
@@ -118,14 +122,13 @@ formInsidePopup.addEventListener('submit', function (evt) {
     // Создание новой карточкуи с полученными данными
     const newCard = creatingCard(nameValue, linkValue, removeCard);
 
-    // Найти контейнер для карточек
-    const placesList = document.querySelector('.places__list');
     // Вставить новую карточку в начало контейнера
     placesList.prepend(newCard);
 
     // Очистить поля формы
     formInsidePopup.reset();
 
-    closePopup(document.querySelector('.popup_is-opened')); // Закрыть окно после добавления карточки
+    const popupToClose = document.querySelector('.popup_is-opened');
+    closePopup(popupToClose); // Закрыть окно после добавления карточки
 });
 

@@ -1,5 +1,9 @@
 import { closeEscape, closeOverlay,} from '../index.js';
 
+const imagePopup = document.querySelector('.popup_type_image'); // Получаем попап с изображением
+const imageElement = imagePopup.querySelector('.popup__image'); // Находим элемент изображения в попапе
+const captionElement = imagePopup.querySelector('.popup__caption'); // Находим элемент подписи изображения
+
 // Функция открытия модального окна
 export function openPopup(popupElement) {
     popupElement.classList.add('popup_is-animated');
@@ -19,10 +23,6 @@ export function closePopup(popupElement) {
 
 // Функция открытия модального окна изображения
 export function openImagePopup(imageLink, imageName) {
-    const imagePopup = document.querySelector('.popup_type_image'); // Получаем попап с изображением
-    const imageElement = imagePopup.querySelector('.popup__image'); // Находим элемент изображения в попапе
-    const captionElement = imagePopup.querySelector('.popup__caption'); // Находим элемент подписи изображения
-
     imageElement.src = imageLink; // Устанавливаем ссылку изображения
     imageElement.alt = imageName; // Устанавливаем описание изображения (альтернативный текст)
     captionElement.textContent = imageName; // Устанавливаем подпись для изображения
