@@ -16,18 +16,48 @@ function isValidNameOrDescription(inputElement) {
     return pattern.test(inputElement.value);
 }
 
-// Функция проверки валидности поля ввода с учетом минимальной длины
+/// Функция проверки валидности поля ввода с учетом минимальной длины
 function checkMinLengthValidity(inputElement, validationConfig) {
     const minLength = inputElement.minLength;  // Минимальная длина, указанная в атрибуте minLength
     const valueLength = inputElement.value.length; // Длина текущего значения поля ввода
+
+    const errorElement = document.getElementById(`${inputElement.id}-error`);
 
     if (valueLength < minLength) {
         showError(inputElement, validationConfig);  // Показать ошибку, если длина меньше минимальной
     } else {
         hideError(inputElement, validationConfig);  // Скрыть ошибку, если длина удовлетворительная
     }
+    
+    // Проверяем, была ли отображена ошибка по другим причинам, если нет, скрываем ее
+    if (!errorElement.classList.contains(validationConfig.errorClass)) {
+        hideError(inputElement, validationConfig);
+    }
 }
 
+// Функция установки слушателей событий
+const setEventListeners = (formElement, validationConfig) => {
+    const inputList = Array.from(formElement.querySelectorAll('.popup__input'));  // Получение списка инпутов
+    const buttonElement = formElement.querySelector('.popup__button');           // Получение кнопки
+
+    toggleButtonState(inputList, buttonElement, validationConfig);  // Изначальное состояние кнопки
+
+    inputList.forEach((inputElement) => {
+        // Слушатель на событие ввода текста
+        inputElement.addEventListener('input', function () {
+            console.log(`Input event fired for ${inputElement.name}`);
+            checkInputValidity(inputElement, validationConfig);  // Проверка валидности при вводе
+            toggleButtonState(inputList, buttonElement, validationConfig);  // Обновление состояния кнопки
+        });
+
+        // Слушатель на событие изменения значения (фокус ушел из поля)
+        inputElement.addEventListener('change', function () {
+            console.log(`Change event fired for ${inputElement.name}`);
+            hideError(inputElement, validationConfig);  // Скрыть ошибку после изменения значения
+            checkMinLengthValidity(inputElement, validationConfig);  // Проверка минимальной длины
+        });
+    });
+};
 // Функция проверки валидности поля ввода
 function checkInputValidity(inputElement, validationConfig) {
     const isValid = inputElement.validity.valid; // Проверка валидности по стандартным HTML5 правилам
@@ -45,36 +75,6 @@ function checkInputValidity(inputElement, validationConfig) {
     }
 }
 
-// Функция установки слушателей событий
-const setEventListeners = (formElement, validationConfig) => {
-    const inputList = Array.from(formElement.querySelectorAll('.popup__input'));  // Получение списка инпутов
-    const buttonElement = formElement.querySelector('.popup__button');           // Получение кнопки
-
-    toggleButtonState(inputList, buttonElement, validationConfig);  // Изначальное состояние кнопки
-
-    inputList.forEach((inputElement) => {
-        // Слушатель на событие ввода текста
-        inputElement.addEventListener('input', function () {
-            checkInputValidity(inputElement, validationConfig);  // Проверка валидности при вводе
-            toggleButtonState(inputList, buttonElement, validationConfig);  // Обновление состояния кнопки
-        });
-
-        // Слушатель на событие изменения значения (фокус ушел из поля)
-        inputElement.addEventListener('change', function () {
-            hideError(inputElement, validationConfig);  // Скрыть ошибку после изменения значения
-            checkMinLengthValidity(inputElement, validationConfig);  // Проверка минимальной длины
-        });
-
-        // Если у поля указана минимальная длина
-        if (inputElement.minLength > 0) {
-            // Слушатель на событие ввода текста снова (при наличии минимальной длины)
-            inputElement.addEventListener('input', function () {
-                hideError(inputElement, validationConfig);  // Скрыть ошибку при вводе текста
-                checkMinLengthValidity(inputElement, validationConfig);  // Проверка минимальной длины
-            });
-        }
-    });
-};
 
 // Событие при полной загрузке DOM
 document.addEventListener('DOMContentLoaded', function () {
@@ -103,6 +103,14 @@ document.addEventListener('DOMContentLoaded', function () {
 const showError = (inputElement, validationConfig) => {
     const errorElement = document.getElementById(`${inputElement.id}-error`);
     if (errorElement) {
+
+        console.log(`Showing error for: ${inputElement.name}`, errorElement.textContent);
+        console.log(`Adding .popup__error_visible to ${inputElement.name}`);
+        console.log(`Before adding .popup__error_visible: ${inputElement.name}`);
+        errorElement.classList.add('popup__error_visible');  // Добавление класса стиля для видимости ошибки (в консоль выводится дважды)
+        console.log(`After adding .popup__error_visible: ${inputElement.name}`);
+        errorElement.classList.add('popup__error_visible');  // Добавление класса стиля для видимости ошибки (в консоль выводится дважды)
+       
         inputElement.classList.add(validationConfig.inputErrorClass);  // Добавление класса стиля для невалидного инпута
 
         // Проверка наличия значения в поле
@@ -127,11 +135,10 @@ const showError = (inputElement, validationConfig) => {
 
         errorElement.classList.add(validationConfig.errorClass);  // Добавление класса стиля для видимости ошибки
         console.log(`Showing error for: ${inputElement.name}`, errorElement.textContent);
-        console.log(`Adding .popup__error_visible to ${inputElement.name}`);
         console.log(`Before adding .popup__error_visible: ${inputElement.name}`);
         errorElement.classList.add('popup__error_visible');  // Добавление класса стиля для видимости ошибки (в консоль выводится дважды)
         console.log(`After adding .popup__error_visible: ${inputElement.name}`);
-        errorElement.classList.add('popup__error_visible');  // Добавление класса стиля для видимости ошибки (в консоль выводится дважды)
+        errorElement.classList.add('popup__error_visible'); 
     }
 };
 
