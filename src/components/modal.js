@@ -16,7 +16,9 @@ export function openPopup(popupElement) {
 
 // Функция закрытия модального окна
 export function closePopup(popupElement) {
-    popupElement.classList.remove('popup_is-opened');
+    if (popupElement) {
+        popupElement.classList.remove('popup_is-opened');
+    }
     document.removeEventListener('keydown', closeEscape);
     document.removeEventListener('click', closeOverlay);
 }

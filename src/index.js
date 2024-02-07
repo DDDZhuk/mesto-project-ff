@@ -62,16 +62,15 @@ const jobInput = formElement.querySelector('.popup__input_type_description');
 const nameOutput = document.querySelector('.profile__title');
 const jobOutput = document.querySelector('.profile__description');
 
+// Функция обработки события отправки формы редактирования профиля
 function handleFormSubmit(evt) {
     evt.preventDefault();
 
     const nameValue = nameInput.value;
     const jobValue = jobInput.value;
-
-    nameOutput.textContent = nameValue;
-    jobOutput.textContent = jobValue;
-
-    closePopup(document.querySelector('.popup_is-opened'));
+    
+    // Обновление данных на сервере
+    updateUserInfoOnServer(nameValue, jobValue);
 }
 
 formElement.addEventListener('submit', handleFormSubmit);
@@ -86,25 +85,37 @@ editButton.addEventListener('click', function() {
     jobInput.value = profileDescription.textContent;
 });
 
-// Создание новой карточки
+// Объявление переменных для работы с формой "Новое место"
 const formInsidePopup = document.querySelector('.popup_type_new-card .popup__form');
 const linkInput = formInsidePopup.querySelector('.popup__input_type_url');
 const nameInputCard = formInsidePopup.querySelector('.popup__input_type_card-name');
 
+// Функция обработки события отправки формы добавления новой карточки
 formInsidePopup.addEventListener('submit', function(evt) {
     evt.preventDefault();
 
     const nameValue = nameInputCard.value;
     const linkValue = linkInput.value;
 
-    const newCard = creatingCard(nameValue, linkValue, removeCard);
+    // Проверка наличия значений перед отправкой на сервер
+    if (nameValue && linkValue) {
+        // Вызов функции добавления новой карточки на сервер
+        addNewCardToServer(nameValue, linkValue);
 
-    placesList.prepend(newCard);
+        // Создание новой карточки и добавление её на страницу
+        const newCard = creatingCard(nameValue, linkValue, removeCard);
+        placesList.prepend(newCard);
 
-    formInsidePopup.reset();
+        // Очистка формы
+        formInsidePopup.reset();
 
-    const popupToClose = document.querySelector('.popup_is-opened');
-    closePopup(popupToClose);
+        // Закрытие попапа
+        const popupToClose = document.querySelector('.popup_is-opened');
+        closePopup(popupToClose);
+    } else {
+        // Вывести сообщение об ошибке, например, в консоль
+        console.error('Name and link must be provided');
+    }
 });
 
 
@@ -150,51 +161,77 @@ function loadUserInfo() {
             authorization: token
         }
     })
-    .then(res => res.json());
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`Error: ${res.status}`);
+        }
+        return res.json();
+    });
 }
-    // Функция для загрузки карточек с сервера
+
+// Функция для загрузки карточек с сервера
 function loadCards() {
     return fetch(`https://mesto.nomoreparties.co/v1/${cohortId}/cards`, {
         headers: {
             authorization: token
         }
     })
-    .then(res => res.json());
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`Error: ${res.status}`);
+        }
+        return res.json();
+    });
 }
+
 // Функция создания карточки
-function createCard(cardData) {
-    const cardElement = document.createElement('li');
-    cardElement.classList.add('places__item', 'card');
-  
-    const cardImage = document.createElement('img');
-    cardImage.classList.add('card__image');
-    cardImage.src = cardData.link;
-    cardImage.alt = cardData.name;
-  
+function createImageElement(link, alt) {
+    const imageElement = document.createElement('img');
+    imageElement.classList.add('card__image');
+    imageElement.src = link;
+    imageElement.alt = alt;
+    return imageElement;
+}
+
+function createDeleteButton() {
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('card__delete-button');
     deleteButton.type = 'button';
-  
-    const cardDescription = document.createElement('div');
-    cardDescription.classList.add('card__description');
-  
-    const cardTitle = document.createElement('h2');
-    cardTitle.classList.add('card__title');
-    cardTitle.textContent = cardData.name;
-  
+    return deleteButton;
+}
+
+function createDescriptionElement(name) {
+    const descriptionElement = document.createElement('div');
+    descriptionElement.classList.add('card__description');
+    
+    const titleElement = document.createElement('h2');
+    titleElement.classList.add('card__title');
+    titleElement.textContent = name;
+
     const likeButton = document.createElement('button');
     likeButton.classList.add('card__like-button');
     likeButton.type = 'button';
-  
-    cardDescription.appendChild(cardTitle);
-    cardDescription.appendChild(likeButton);
-  
+
+    descriptionElement.appendChild(titleElement);
+    descriptionElement.appendChild(likeButton);
+
+    return descriptionElement;
+}
+
+function createCard(cardData) {
+    const cardElement = document.createElement('li');
+    cardElement.classList.add('places__item', 'card');
+
+    const cardImage = createImageElement(cardData.link, cardData.name);
+    const deleteButton = createDeleteButton();
+    const cardDescription = createDescriptionElement(cardData.name);
+
     cardElement.appendChild(cardImage);
     cardElement.appendChild(deleteButton);
     cardElement.appendChild(cardDescription);
-  
+
     return cardElement;
-  }
+}
 // Функция отображения карточек на странице
 function renderCards(cards) {
     const placesList = document.querySelector('.places__list');
@@ -238,3 +275,81 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error loading user information or cards:', error);
         });
 });
+
+
+// Функция для отправки запроса на сервер для обновления данных пользователя
+function updateUserInfoOnServer(name, about) {
+    fetch(`https://mesto.nomoreparties.co/v1/${cohortId}/users/me`, {
+        method: 'PATCH',
+        headers: {
+            authorization: token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: name,
+            about: about
+        })
+    })
+    .then(res => {
+        // Выводим в консоль информацию о статусе запроса
+        console.log('Server response status:', res.status);
+
+        // Возвращаем результат обещания
+        return res.json();
+    })
+    .then(updatedUserData => {
+        // Выводим в консоль обновленные данные пользователя
+        console.log('Updated user data from the server:', updatedUserData);
+
+        // Обновление данных на странице после успешного обновления на сервере
+        renderUserInfo(updatedUserData);
+
+        // Закрытие попапа
+        closePopup(document.querySelector('.popup_is-opened'));
+    })
+    .catch(error => {
+        console.error('Error updating user information on the server:', error);
+    });
+}
+
+// Функция для добавления новой карточки на сервер
+function addNewCardToServer(name, link) {
+    fetch(`https://mesto.nomoreparties.co/v1/${cohortId}/cards`, {
+        method: 'POST',
+        headers: {
+            authorization: token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: name,
+            link: link
+        })
+    })
+    .then(res => {
+        // Выводим в консоль информацию о статусе запроса
+        console.log('Server response status:', res.status);
+
+        // Возвращаем результат обещания
+        return res.json();
+    })
+    .then(newCardData => {
+        // Выводим в консоль данные о новой карточке, добавленной на сервер
+        console.log('New card added to the server:', newCardData);
+
+        // Создаем DOM-элемент для новой карточки
+        const newCardElement = createCard(newCardData);
+
+        // Добавляем новую карточку на страницу
+        placesList.prepend(newCardElement);
+
+        // Закрываем попап после успешного добавления карточки
+        closePopup(document.querySelector('.popup_is-opened'));
+    })
+    .catch(error => {
+        console.error('Error adding a new card to the server:', error);
+    });
+}
+
+
+// Добавление одного слушателя события
+formInsidePopup.addEventListener('submit', handleFormSubmit);
