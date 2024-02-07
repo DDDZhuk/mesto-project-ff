@@ -21,3 +21,24 @@
   right: 0;
   z-index: 10;
 }
+
+.popup__input-error {
+  width: 164px;
+  height: 12px;
+  flex-shrink: 0;
+  color: #F00;
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-top: 4px;
+  display: none; /* изначально скрываем элемент с ошибкой */
+}
+
+.popup__error_visible {
+  display: block; /* отображаем элемент с ошибкой, когда он нужен */
+  height: auto;
+  width: auto;
+}
+
