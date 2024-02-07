@@ -1,4 +1,5 @@
 
+
 // Конфигурация валидации формы
 const validationConfig = {
     formSelector: '.popup__form',                // Селектор формы
@@ -100,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Функция показа ошибки
 const showError = (inputElement, validationConfig) => {
-    const errorElement = document.getElementById(`${inputElement.name}-input-error`);  // Элемент для отображения ошибки
+    const errorElement = document.getElementById(`${inputElement.id}-error`);
     if (errorElement) {
         inputElement.classList.add(validationConfig.inputErrorClass);  // Добавление класса стиля для невалидного инпута
 
@@ -136,7 +137,7 @@ const showError = (inputElement, validationConfig) => {
 
 // Функция скрытия ошибки
 const hideError = (inputElement, validationConfig) => {
-    const errorElement = document.getElementById(`${inputElement.name}-input-error`);  // Элемент для отображения ошибки
+    const errorElement = document.getElementById(`${inputElement.id}-error`);
     if (errorElement) {
         inputElement.classList.remove(validationConfig.inputErrorClass);  // Удаление класса стиля для невалидного инпута
         errorElement.textContent = '';  // Очистка текста ошибки
