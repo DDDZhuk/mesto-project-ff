@@ -42,3 +42,7 @@
   width: auto;
 }
 
+.popup__input_type_error {
+  border-bottom-color: red; /* Красная нижняя граница */
+  transition: border-bottom-color 0.3s ease; /* Плавное изменение цвета границы */
+}

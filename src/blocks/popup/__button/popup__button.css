@@ -29,3 +29,10 @@
     line-height: 17px;
   }
 }
+
+.button_inactive {
+  background:white;
+  cursor: pointer; 
+  color:  #d3d3d3;
+  border: 1px solid   #d3d3d3;
+}

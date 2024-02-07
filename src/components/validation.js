@@ -154,11 +154,17 @@ const hideError = (inputElement, validationConfig) => {
 
 // Функция переключения состояния кнопки
 const toggleButtonState = (inputList, buttonElement, validationConfig) => {
-    if (hasInvalidInput(inputList)) {
-        buttonElement.disabled = true;  // Если есть невалидные поля, кнопка неактивна
+    const hasInvalidInputs = hasInvalidInput(inputList);
+    const hasVisibleErrors = inputList.some(inputElement => {
+        const errorElement = document.getElementById(`${inputElement.id}-error`);
+        return errorElement && errorElement.classList.contains(validationConfig.errorClass);
+    });
+
+    if (hasInvalidInputs || hasVisibleErrors) {
+        buttonElement.disabled = true;  // Если есть невалидные поля или видимые ошибки, кнопка неактивна
         buttonElement.classList.add('button_inactive');  // Добавление класса стиля для неактивной кнопки
     } else {
-        buttonElement.disabled = false;  // Если все поля валидны, кнопка активна
+        buttonElement.disabled = false;  // Если все поля валидны и нет видимых ошибок, кнопка активна
         buttonElement.classList.remove('button_inactive');  // Удаление класса стиля для неактивной кнопки
     }
 };

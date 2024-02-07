@@ -133,3 +133,108 @@ if (editProfileForm) {
     console.error('Form element not found');
 }
 clearValidation(editProfileForm, validationConfig);
+
+
+
+
+
+
+
+const token = '42dac586-42d1-4d3d-afd7-f10e4a680978';
+const cohortId = 'wff-cohort-5';
+
+// Функция для загрузки информации о пользователе с сервера
+function loadUserInfo() {
+    return fetch(`https://mesto.nomoreparties.co/v1/${cohortId}/users/me`, {
+        headers: {
+            authorization: token
+        }
+    })
+    .then(res => res.json());
+}
+    // Функция для загрузки карточек с сервера
+function loadCards() {
+    return fetch(`https://mesto.nomoreparties.co/v1/${cohortId}/cards`, {
+        headers: {
+            authorization: token
+        }
+    })
+    .then(res => res.json());
+}
+// Функция создания карточки
+function createCard(cardData) {
+    const cardElement = document.createElement('li');
+    cardElement.classList.add('places__item', 'card');
+  
+    const cardImage = document.createElement('img');
+    cardImage.classList.add('card__image');
+    cardImage.src = cardData.link;
+    cardImage.alt = cardData.name;
+  
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('card__delete-button');
+    deleteButton.type = 'button';
+  
+    const cardDescription = document.createElement('div');
+    cardDescription.classList.add('card__description');
+  
+    const cardTitle = document.createElement('h2');
+    cardTitle.classList.add('card__title');
+    cardTitle.textContent = cardData.name;
+  
+    const likeButton = document.createElement('button');
+    likeButton.classList.add('card__like-button');
+    likeButton.type = 'button';
+  
+    cardDescription.appendChild(cardTitle);
+    cardDescription.appendChild(likeButton);
+  
+    cardElement.appendChild(cardImage);
+    cardElement.appendChild(deleteButton);
+    cardElement.appendChild(cardDescription);
+  
+    return cardElement;
+  }
+// Функция отображения карточек на странице
+function renderCards(cards) {
+    const placesList = document.querySelector('.places__list');
+    
+    cards.forEach((card) => {
+      const cardElement = createCard(card);
+      placesList.appendChild(cardElement);
+    });
+  }
+
+// Функция отображения информации о пользователе на странице
+function renderUserInfo(userData) {
+    const profileTitle = document.getElementById('profileTitle');
+    const profileDescription = document.getElementById('profileDescription');
+    const profileImage = document.getElementById('profileImage');
+
+    if (profileTitle) {
+        profileTitle.textContent = userData.name || '';
+    }
+
+    if (profileDescription) {
+        profileDescription.textContent = userData.about || '';
+    }
+
+    if (profileImage) {
+        profileImage.style.backgroundImage = `url(${userData.avatar || ''})`;
+    }
+}
+
+// Вызов функции загрузки данных пользователя и карточек
+document.addEventListener('DOMContentLoaded', function () {
+    Promise.all([loadUserInfo(), loadCards()])
+        .then(([userData, cardsData]) => {
+            // Обновление информации о пользователе
+            renderUserInfo(userData);
+
+            // Отображение карточек на странице
+            renderCards(cardsData);
+        })
+        .catch((error) => {
+            console.error('Error loading user information or cards:', error);
+        });
+});
